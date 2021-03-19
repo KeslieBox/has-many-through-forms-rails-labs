@@ -1,8 +1,32 @@
-<%= form_for @post do |f| %>
-    <%= f.label "Comments" %>
-    <%= f.text_field :content%>
+<h1><%=@post.title%></h1>
+<%=@post.content%><br><br>
+<p>Categories:
+<% @post.categories.each do |category|%>
+    <%=category.name%>, 
+<%end%>
+</p>
+<p>Comments:
+<% @post.comments.each do |comment|%>
+    <p><%= comment.user.username %> says: <%= comment.content%></p>
+<%end%>
+</p>
+<% @post.users.detect do |user| %>
+    <p><%=link_to user.username, user_path(user)%> says: <%=user.comments%></p>
+<%end%>
 
-    <%=f.collection_sellect :user_id, User.all, %>
+<%= form_for @post.comments.build do |f| %>
+    <%= f.hidden_field :post_id, value: @post.id %>
+    <%= f.label "New Comment"%>
+    <%= f.text_field :content%><br>
+    <%= f.label "Select User" %>
+    <%= f.collection_select :user_id, User.all, :id, :username %><br>
+    <%= f.fields_for :user, User.new do |user_fields| %>
+        <%= user_fields.label :username %>
+        <%= user_fields.text_field :username %>
+        <%= user_fields.label :email %>
+        <%= user_fields.text_field :email %>
+    <% end %>
+
     <%= f.submit %>
 
 <% end %>
